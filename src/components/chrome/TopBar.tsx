@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Camera, Eraser, FileText, FlipHorizontal2, FlipVertical2, Layers, RotateCw, ScanLine, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Camera, Eraser, FileText, FlipHorizontal2, FlipVertical2, Layers, RotateCw, ScanLine, Loader2, CheckCircle2, AlertCircle, SwitchCamera } from "lucide-react";
 import { useCameraStore } from "@/stores/cameraStore";
 import { useDocumentStore } from "@/stores/documentStore";
 import { useInteractionStore } from "@/stores/interactionStore";
@@ -34,7 +34,7 @@ function ScanStatusPill() {
 }
 
 export function TopBar() {
-  const { mode, setMode, calibration, toggleCalibration } = useCameraStore();
+  const { mode, setMode, facingMode, toggleFacingMode, calibration, toggleCalibration } = useCameraStore();
   const { hudVisible, toggleHud } = useDocumentStore();
   const clearStrokes = useInteractionStore((s) => s.clearStrokes);
 
@@ -71,6 +71,14 @@ export function TopBar() {
 
         {mode === "camera" && (
           <div className="mr-2 flex items-center gap-1.5 border-r border-white/10 pr-3">
+            <Toggle
+              id="btn-cal-switch-camera"
+              label={facingMode === "user" ? "Front camera active (tap to switch to back)" : "Back camera active (tap to switch to front)"}
+              active={facingMode === "user"}
+              onClick={toggleFacingMode}
+            >
+              <SwitchCamera className="h-4 w-4" /> <span className="text-[0.7rem]">{facingMode === "user" ? "Front" : "Back"}</span>
+            </Toggle>
             <Toggle id="btn-cal-rotate" label="Rotate 180°" active={calibration.rotate180} onClick={() => toggleCalibration("rotate180")}>
               <RotateCw className="h-4 w-4" /> <span className="text-[0.7rem]">180°</span>
             </Toggle>

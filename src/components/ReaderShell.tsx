@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PenLine } from "lucide-react";
 import { CameraViewport } from "@/components/camera/CameraViewport";
 import { AnnotationCanvas } from "@/components/annotation/AnnotationCanvas";
 import { ARHudOverlay } from "@/components/hud/ARHudOverlay";
@@ -11,13 +10,11 @@ import { TopBar } from "@/components/chrome/TopBar";
 import { usePageScanner } from "@/hooks/usePageScanner";
 import { useCameraStore } from "@/stores/cameraStore";
 import { useInteractionStore } from "@/stores/interactionStore";
-import { useDocumentStore } from "@/stores/documentStore";
 
 export function ReaderShell() {
   const videoRef = useRef<HTMLVideoElement>(null);
   usePageScanner(videoRef);
   const toast = useInteractionStore((s) => s.toast);
-  const recognized = useDocumentStore((s) => s.scanStatus === "recognized");
 
   useEffect(() => useCameraStore.getState().hydrate(), []);
 
@@ -35,21 +32,6 @@ export function ReaderShell() {
         </CameraViewport>
 
         <MetricExplanationSheet />
-
-        <AnimatePresence>
-          {recognized && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ delay: 0.8 }}
-              className="hud-chip pointer-events-none absolute bottom-4 left-4 z-10 flex items-center gap-2 !px-3 !py-2 text-xs"
-            >
-              <PenLine className="h-3.5 w-3.5 text-amber-300" />
-              <span className="text-zinc-300">Circle any number, or underline a row, to explain it</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <AnimatePresence>
           {toast && (

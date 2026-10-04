@@ -320,7 +320,7 @@ const rows: RowSpec[] = [
 const metrics = buildMetrics(rows);
 const m = (id: string) => metrics.find((x) => x.id === id)!;
 
-const annotations: HudAnnotation[] = [
+export const sampleAnnotations: HudAnnotation[] = [
   {
     id: "a-rev",
     metricId: "revenue",
@@ -379,7 +379,7 @@ export const nvidiaQ3FY26: RecognizedPage = {
   aspect: LAYOUT.aspect,
   sectionBBox: [0.05, 0.05, 0.96, 0.97],
   metrics,
-  annotations,
+  annotations: [],
   confidence: 0.97,
   source: "mock",
 };

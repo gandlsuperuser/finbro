@@ -10,7 +10,7 @@ import { useCameraStore } from "@/stores/cameraStore";
  */
 export function useCamera(videoRef: RefObject<HTMLVideoElement | null>) {
   const streamRef = useRef<MediaStream | null>(null);
-  const { mode, deviceId, setStatus, setResolution, setDevices, setDeviceId } = useCameraStore();
+  const { mode, deviceId, facingMode, setStatus, setResolution, setDevices, setDeviceId } = useCameraStore();
 
   const stop = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -33,16 +33,27 @@ export function useCamera(videoRef: RefObject<HTMLVideoElement | null>) {
 
     (async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: {
-            ...(deviceId ? { deviceId: { exact: deviceId } } : { facingMode: { ideal: "environment" } }),
-            width: { ideal: 1920 },
-            height: { ideal: 1440 },
-            aspectRatio: { ideal: 4 / 3 },
-            frameRate: { ideal: 30, max: 30 },
-          },
-        });
+        const targetFacing = facingMode || "user";
+        let stream: MediaStream;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+              ...(deviceId ? { deviceId: { exact: deviceId } } : { facingMode: targetFacing }),
+              width: { ideal: 1920 },
+              height: { ideal: 1440 },
+              aspectRatio: { ideal: 4 / 3 },
+              frameRate: { ideal: 30, max: 30 },
+            },
+          });
+        } catch {
+          // Fallback if iPad front camera rejects 4:3 / specific resolution bounds
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: deviceId ? { deviceId: { exact: deviceId } } : { facingMode: targetFacing },
+          });
+        }
+
         if (cancelled) return stream.getTracks().forEach((t) => t.stop());
         stop();
         streamRef.current = stream;
@@ -78,5 +89,5 @@ export function useCamera(videoRef: RefObject<HTMLVideoElement | null>) {
       stop();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, deviceId]);
+  }, [mode, deviceId, facingMode]);
 }

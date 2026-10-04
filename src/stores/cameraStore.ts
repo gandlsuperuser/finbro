@@ -3,6 +3,7 @@ import { DEFAULT_CALIBRATION, loadCalibration, saveCalibration, type Calibration
 
 export type CameraStatus = "idle" | "requesting" | "live" | "denied" | "unavailable";
 export type SourceMode = "camera" | "demo";
+export type FacingMode = "user" | "environment";
 
 interface CameraState {
   deviceId: string | null;
@@ -11,6 +12,7 @@ interface CameraState {
   status: CameraStatus;
   error: string | null;
   mode: SourceMode;
+  facingMode: FacingMode;
   calibration: Calibration;
   hydrate: () => void;
   setDevices: (d: MediaDeviceInfo[]) => void;
@@ -18,6 +20,8 @@ interface CameraState {
   setResolution: (r: { width: number; height: number } | null) => void;
   setStatus: (s: CameraStatus, error?: string | null) => void;
   setMode: (m: SourceMode) => void;
+  setFacingMode: (f: FacingMode) => void;
+  toggleFacingMode: () => void;
   toggleCalibration: (k: keyof Calibration) => void;
   resetCalibration: () => void;
 }
@@ -29,6 +33,7 @@ export const useCameraStore = create<CameraState>((set, get) => ({
   status: "idle",
   error: null,
   mode: "demo",
+  facingMode: "user",
   calibration: DEFAULT_CALIBRATION,
   hydrate: () => set({ calibration: loadCalibration() }),
   setDevices: (devices) => set({ devices }),
@@ -36,6 +41,12 @@ export const useCameraStore = create<CameraState>((set, get) => ({
   setResolution: (resolution) => set({ resolution }),
   setStatus: (status, error = null) => set({ status, error }),
   setMode: (mode) => set({ mode }),
+  setFacingMode: (facingMode) => set({ facingMode, deviceId: null }),
+  toggleFacingMode: () =>
+    set((s) => ({
+      facingMode: s.facingMode === "user" ? "environment" : "user",
+      deviceId: null,
+    })),
   toggleCalibration: (k) => {
     const calibration = { ...get().calibration, [k]: !get().calibration[k] };
     saveCalibration(calibration);

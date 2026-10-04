@@ -84,9 +84,6 @@ export function DemoDocument() {
         );
       })}
 
-      <div className="absolute text-[#555]" style={{ left: "7%", bottom: "3%", fontSize: "0.95cqw" }}>
-        See accompanying notes to condensed consolidated financial statements. — Illustrative fixture for FinBro.
-      </div>
       <div className="absolute text-[#555]" style={{ right: "5%", bottom: "3%", fontSize: "0.95cqw" }}>
         3
       </div>

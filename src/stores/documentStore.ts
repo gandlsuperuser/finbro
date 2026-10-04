@@ -19,7 +19,7 @@ export const useDocumentStore = create<DocumentState>((set) => ({
   scanStatus: "idle",
   lastScanAt: null,
   lastLatencyMs: null,
-  hudVisible: true,
+  hudVisible: false,
   setPage: (page, latencyMs) =>
     set({
       page,
