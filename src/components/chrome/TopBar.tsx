@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Camera, Eraser, FileText, FlipHorizontal2, FlipVertical2, Layers, RotateCw, ScanLine, Loader2, CheckCircle2, AlertCircle, SwitchCamera } from "lucide-react";
+import { Camera, Eraser, FileText, FlipHorizontal2, FlipVertical2, Layers, RotateCw, RotateCcw, ScanLine, Loader2, CheckCircle2, AlertCircle, SwitchCamera } from "lucide-react";
 import { useCameraStore } from "@/stores/cameraStore";
 import { useDocumentStore } from "@/stores/documentStore";
 import { useInteractionStore } from "@/stores/interactionStore";
@@ -34,9 +34,21 @@ function ScanStatusPill() {
 }
 
 export function TopBar() {
-  const { mode, setMode, facingMode, toggleFacingMode, calibration, toggleCalibration } = useCameraStore();
+  const {
+    mode,
+    setMode,
+    facingMode,
+    toggleFacingMode,
+    calibration,
+    toggleRotate180,
+    rotate90,
+    toggleCalibration,
+    resetCalibration,
+  } = useCameraStore();
   const { hudVisible, toggleHud } = useDocumentStore();
   const clearStrokes = useInteractionStore((s) => s.clearStrokes);
+
+  const currentRot = calibration.rotation ?? (calibration.rotate180 ? 180 : 0);
 
   return (
     <header className="relative z-20 flex h-14 shrink-0 items-center gap-4 border-b border-white/5 bg-[#0a0b0e]/90 px-4 backdrop-blur-xl">
@@ -79,14 +91,43 @@ export function TopBar() {
             >
               <SwitchCamera className="h-4 w-4" /> <span className="text-[0.7rem]">{facingMode === "user" ? "Front" : "Back"}</span>
             </Toggle>
-            <Toggle id="btn-cal-rotate" label="Rotate 180°" active={calibration.rotate180} onClick={() => toggleCalibration("rotate180")}>
+            <Toggle
+              id="btn-cal-rotate"
+              label="Rotate 180°"
+              active={currentRot === 180}
+              onClick={toggleRotate180}
+            >
               <RotateCw className="h-4 w-4" /> <span className="text-[0.7rem]">180°</span>
             </Toggle>
-            <Toggle id="btn-cal-mirror-h" label="Mirror horizontal" active={calibration.mirrorH} onClick={() => toggleCalibration("mirrorH")}>
+            <Toggle
+              id="btn-cal-rotate-90"
+              label={`Current angle: ${currentRot}° (tap to rotate +90°)`}
+              onClick={rotate90}
+            >
+              <RotateCw className="h-4 w-4 opacity-75" /> <span className="text-[0.7rem] opacity-75">+90°</span>
+            </Toggle>
+            <Toggle
+              id="btn-cal-mirror-h"
+              label="Mirror horizontal"
+              active={calibration.mirrorH}
+              onClick={() => toggleCalibration("mirrorH")}
+            >
               <FlipHorizontal2 className="h-4 w-4" />
             </Toggle>
-            <Toggle id="btn-cal-mirror-v" label="Mirror vertical" active={calibration.mirrorV} onClick={() => toggleCalibration("mirrorV")}>
+            <Toggle
+              id="btn-cal-mirror-v"
+              label="Mirror vertical"
+              active={calibration.mirrorV}
+              onClick={() => toggleCalibration("mirrorV")}
+            >
               <FlipVertical2 className="h-4 w-4" />
+            </Toggle>
+            <Toggle
+              id="btn-cal-reset"
+              label="Reset to default 180° upright orientation"
+              onClick={resetCalibration}
+            >
+              <RotateCcw className="h-4 w-4" /> <span className="text-[0.7rem]">Reset</span>
             </Toggle>
           </div>
         )}

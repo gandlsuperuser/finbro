@@ -1,21 +1,30 @@
 export interface Calibration {
+  rotation: number; // 0, 90, 180, 270 degrees
   rotate180: boolean;
   mirrorH: boolean;
   mirrorV: boolean;
 }
 
 export const DEFAULT_CALIBRATION: Calibration = {
-  rotate180: true, // periscope mirror delivers the feed upside-down
+  rotation: 180, // periscope mirror delivers the feed upside-down; 180° makes it upright
+  rotate180: true,
   mirrorH: false,
   mirrorV: false,
 };
 
 /** CSS transform applied to the <video> so the document reads upright. GPU-composited. */
 export function calibrationToCss(c: Calibration): string {
+  const rot = typeof c.rotation === "number" ? c.rotation : c.rotate180 ? 180 : 0;
   const parts: string[] = [];
-  if (c.rotate180) parts.push("rotate(180deg)");
-  parts.push(`scale(${c.mirrorH ? -1 : 1}, ${c.mirrorV ? -1 : 1})`);
-  return parts.join(" ");
+  if (rot !== 0) parts.push(`rotate(${rot}deg)`);
+  if (c.mirrorH && c.mirrorV) {
+    parts.push("scale(-1, -1)");
+  } else if (c.mirrorH) {
+    parts.push("scaleX(-1)");
+  } else if (c.mirrorV) {
+    parts.push("scaleY(-1)");
+  }
+  return parts.length ? parts.join(" ") : "none";
 }
 
 /** Same transform for a 2D canvas (used when grabbing frames for analysis). */
@@ -25,8 +34,9 @@ export function applyCalibrationToCtx(
   w: number,
   h: number,
 ) {
+  const rot = typeof c.rotation === "number" ? c.rotation : c.rotate180 ? 180 : 0;
   ctx.translate(w / 2, h / 2);
-  if (c.rotate180) ctx.rotate(Math.PI);
+  if (rot !== 0) ctx.rotate((rot * Math.PI) / 180);
   ctx.scale(c.mirrorH ? -1 : 1, c.mirrorV ? -1 : 1);
   ctx.translate(-w / 2, -h / 2);
 }
@@ -62,7 +72,7 @@ export function clientToDoc(clientX: number, clientY: number, content: DOMRect |
   };
 }
 
-const STORAGE_KEY = "finbro.calibration.v1";
+const STORAGE_KEY = "finbro.calibration.v2";
 
 export function loadCalibration(): Calibration {
   if (typeof window === "undefined") return DEFAULT_CALIBRATION;

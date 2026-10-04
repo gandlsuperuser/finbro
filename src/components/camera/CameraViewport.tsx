@@ -50,7 +50,13 @@ export function CameraViewport({ videoRef, children }: Props) {
           muted
           autoPlay
           className="absolute inset-0 h-full w-full object-fill will-change-transform"
-          style={{ transform: calibrationToCss(calibration), display: showVideo ? "block" : "none" }}
+          style={{
+            transform: calibrationToCss(calibration),
+            WebkitTransform: calibrationToCss(calibration),
+            transformOrigin: "center center",
+            WebkitTransformOrigin: "center center",
+            display: showVideo ? "block" : "none",
+          }}
         />
         {!showVideo && <DemoDocument />}
         {children?.(stage)}
