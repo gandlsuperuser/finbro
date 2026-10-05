@@ -5,6 +5,7 @@ import { Camera, Eraser, FileText, FlipHorizontal2, FlipVertical2, Layers, Rotat
 import { useCameraStore } from "@/stores/cameraStore";
 import { useDocumentStore } from "@/stores/documentStore";
 import { useInteractionStore } from "@/stores/interactionStore";
+import { QwenStatusPill } from "./QwenStatusPill";
 
 function Toggle({ id, active, onClick, children, label }: { id: string; active?: boolean; onClick: () => void; children: React.ReactNode; label: string }) {
   return (
@@ -62,6 +63,7 @@ export function TopBar() {
       </div>
 
       <ScanStatusPill />
+      <QwenStatusPill />
 
       <div className="ml-auto flex items-center gap-1.5">
         <div className="mr-2 flex rounded-full bg-white/5 p-0.5 ring-1 ring-white/10">

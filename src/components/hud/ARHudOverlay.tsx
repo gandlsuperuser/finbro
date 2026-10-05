@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useDocumentStore } from "@/stores/documentStore";
 import { useInteractionStore } from "@/stores/interactionStore";
+import { ARFloatingCallout } from "./ARFloatingCallout";
 import type { BBox, Severity } from "@/types/finance";
 
 const pct = (n: number) => `${n * 100}%`;
@@ -28,7 +29,6 @@ export function ARHudOverlay() {
   const page = useDocumentStore((s) => s.page);
   const hudVisible = useDocumentStore((s) => s.hudVisible);
   const selection = useInteractionStore((s) => s.selection);
-  const sheetOpen = useInteractionStore((s) => s.sheetOpen);
 
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -93,10 +93,10 @@ export function ARHudOverlay() {
       </AnimatePresence>
 
       <AnimatePresence>
-        {sheetOpen && selection && page && (() => {
+        {selection && page && (() => {
           const m = page.metrics.find((x) => x.id === selection.metricId);
           if (!m) return null;
-          const target = selection.cellIndex === null ? m.rowBBox : m.cells[selection.cellIndex].bbox;
+          const target = selection.cellIndex === null ? m.rowBBox : m.cells[selection.cellIndex]?.bbox ?? m.rowBBox;
           return (
             <motion.div
               key={`${m.id}-${selection.cellIndex}`}
@@ -110,6 +110,8 @@ export function ARHudOverlay() {
           );
         })()}
       </AnimatePresence>
+
+      <ARFloatingCallout />
     </div>
   );
 }
